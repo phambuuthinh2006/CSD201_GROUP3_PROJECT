@@ -1,4 +1,4 @@
-# ĐỒ ÁN CSD201 — NÉN DỮ LIỆU KHÔNG MẤT MÁT (GROUP 6)
+# ĐỒ ÁN CSD201 — NÉN DỮ LIỆU KHÔNG MẤT MÁT (GROUP 3)
 
 ## 1. Giới thiệu
 Dự án so sánh 4 thuật toán nén: **RLE, Huffman Canonical, LZW 12-bit và LZ4 Block**.

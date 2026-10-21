@@ -11,3 +11,5 @@ java -Xmx1g -cp target/classes vn.csd.compression.metrics.LZ4Rq3Runner \
   results/lz4-smoke-new.csv 1 2 src/main/java/vn/csd/compression/codec/LZ4Codec.java \
   2> results/lz4-smoke-new-environment.log
 ```
+
+CSV smoke đã lưu là số liệu trước khi refactor bỏ static; đường dẫn input vẫn như cũ nhưng nội dung source hiện đã thay đổi. Chạy lại bằng tên CSV mới để đo phiên bản hiện tại.

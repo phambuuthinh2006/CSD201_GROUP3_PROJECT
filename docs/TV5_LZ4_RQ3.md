@@ -62,3 +62,7 @@ Lệnh trong phiên này: `/tmp/apache-maven-3.9.9/bin/mvn -q test` vì máy ch�
 Phần TV5 trên branch `feature/lz4-tv5` được đặt trên nền `origin/main` commit `e2fda35`, sau khi remote thay lịch sử ban đầu. Giữ nguyên interface `Codec.java` và `.gitignore` chung. `pom.xml` giữ source/target Java 8 và JUnit 4, bổ sung JUnit 5 + Vintage cùng oracle LZ4 test-only và Surefire. README chung có lệnh Maven vì test JUnit cần dependency trong classpath.
 
 Kiểm chứng sau tích hợp: `mvn clean verify` PASS, 18/18 lượt test TV5. Ngoài ra đã lấy source LZW/test dạng `main()` từ `origin/lzw-Phat` commit `867210b`, biên dịch tạm với `javac --release 8` dựa trên interface chung và chạy toàn bộ bài test LZW PASS. Đây là kiểm tra tương thích ngoài thư mục repo; mã LZW vẫn thuộc branch TV2, không được đưa vào commit TV5. Test LZW dạng `main()` cần chạy riêng, Maven không tự thực thi thân `main()`.
+
+## Cập nhật instance API
+
+Đã bỏ static trong codec, helper và test TV5. Giới hạn input lấy bằng `codec.getMaxInputSize()` thay `LZ4Codec.MAX_INPUT_SIZE`. Runner gọi qua `new LZ4Rq3Runner().run(args)`; static main chỉ tạo instance và chuyển args để giữ lệnh CLI Java 8/17. Bộ test sau thay đổi PASS18.

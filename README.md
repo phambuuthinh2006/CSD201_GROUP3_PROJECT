@@ -48,6 +48,8 @@ LZ4Codec.BlockStatistics stats = codec.analyze(compressed);
 ```
 
 - `compress(byte[])`, `decompress(byte[])` theo interface `Codec` chung.
+- Codec và helper dùng phương thức instance, không khai báo `static`. Runner có `run(args)` instance; chỉ điểm vào CLI `main` giữ `static` theo yêu cầu Java 8/17.
+- Lấy giới hạn input qua `codec.getMaxInputSize()` (64 MiB).
 - Container gồm magic `LZ4B`, độ dài gốc 8 byte BE, độ dài block 4 byte BE, rồi payload LZ4. BE của block length là quy ước cần TV6 xác nhận với đề gốc.
 - Giới hạn input 64 MiB. Dữ liệu hỏng gây `IllegalArgumentException`, null gây `NullPointerException`.
 - `getName()` trả `LZ4`; runner ghi hash log riêng. Decoder không phụ thuộc hash log.

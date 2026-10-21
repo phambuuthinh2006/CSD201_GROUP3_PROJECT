@@ -249,9 +249,9 @@ Cuối cùng:
 
 ```java
 ByteBuffer.wrap(result)
-    .putInt(MAGIC)
+    .putInt(magic)
     .putLong(n)
-    .putInt(result.length - HEADER_SIZE);
+    .putInt(result.length - headerSize);
 ```
 
 Input rỗng tạo container 17 byte: header 16 byte và token 0. File ngắn hoặc khó nén có thể lớn hơn input do overhead; điều đó vẫn hợp lệ.
@@ -421,3 +421,24 @@ Kết quả đã kiểm chứng ngày 21/10/2026: **18/18 lượt test PASS**, b
 - [Bàn giao TV5 → TV6](TV5_LZ4_RQ3.md).
 - [LZ4 Block Format — đặc tả chính thức](https://github.com/lz4/lz4/blob/dev/doc/lz4_Block_format.md).
 - [[TASK_BOARD]]: CSD-LZ4-TV5-001, CSD-RQ3-TV6-002 và CSD-LZ4-DOC-003.
+
+## Cập nhật: tổ chức theo đối tượng, bỏ static
+
+Theo yêu cầu giảng viên, `LZ4Codec` không còn khai báo `static`: các hàm đọc header, parse, đọc/ghi length và đọc byte đều là phương thức instance; các giá trị `magic`, `headerSize`, `maxInputSize` là trường `private final` của từng đối tượng. Constructor mặc định gọi `this(12)`. `Cursor` và `BlockStatistics` là lớp bên trong không static.
+
+`final` vẫn được giữ để các giá trị không bị gán lại; `final` không có nghĩa là `static`.
+
+Mã dùng giới hạn input chuyển từ `LZ4Codec.MAX_INPUT_SIZE` sang `codec.getMaxInputSize()`. API chính vẫn là `new LZ4Codec(12)` hoặc `new LZ4Codec(16)` rồi gọi `compress`, `decompress`, `analyze`.
+
+Runner có constructor public và hàm instance:
+
+```java
+LZ4Rq3Runner runner = new LZ4Rq3Runner();
+runner.run(new String[]{"results/demo.csv", "1", "2", "README.md"});
+```
+
+Chỉ giữ một khai báo static trong phần source/test TV5: `public static void main(String[] args)` của runner để Java 8/17 gọi từ dòng lệnh. Hàm này chỉ tạo đối tượng và gọi `run(args)`; không chứa thuật toán hay logic benchmark. Nếu chỉ tích hợp vào runner chung của TV4, gọi `run()` trực tiếp, không cần gọi `main()` của TV5.
+
+Helper trong test cũng là instance và không dùng static import. Các API thư viện chuẩn như `Arrays.fill`, `Math.min` hoặc `Files.readAllBytes` vẫn được gọi theo API Java; thay đổi này loại bỏ khai báo static trong mã do TV5 định nghĩa, ngoại trừ điểm vào CLI.
+
+Sau thay đổi, `mvn clean verify` PASS 18/18 test; container và hai hash log giữ cùng định dạng.

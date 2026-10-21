@@ -13,9 +13,13 @@ import java.util.Locale;
 
 /** LZ4-only RQ3 measurements; TV4/TV6 merge these with the common runner. */
 public final class LZ4Rq3Runner {
-    private LZ4Rq3Runner() { }
+    public LZ4Rq3Runner() { }
 
     public static void main(String[] args) throws Exception {
+        new LZ4Rq3Runner().run(args);
+    }
+
+    public void run(String[] args) throws Exception {
         if (args.length < 4) {
             throw new IllegalArgumentException("Usage: LZ4Rq3Runner output.csv warmups repeats input-file...");
         }
@@ -33,9 +37,10 @@ public final class LZ4Rq3Runner {
                     + "; maxHeap=" + Runtime.getRuntime().maxMemory()
                     + "; JVM args=" + java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments()
                     + "; warmups=" + warmups + "; repeats=" + repeats);
+            LZ4Codec sizePolicy = new LZ4Codec();
             for (int i = 3; i < args.length; i++) {
                 Path path = Paths.get(args[i]);
-                if (Files.size(path) > LZ4Codec.MAX_INPUT_SIZE) throw new IllegalArgumentException("File exceeds 64 MiB: " + path);
+                if (Files.size(path) > sizePolicy.getMaxInputSize()) throw new IllegalArgumentException("File exceeds 64 MiB: " + path);
                 byte[] input = Files.readAllBytes(path);
                 byte[] expected = sha256(input);
                 for (int hashLog : new int[]{12, 16}) {
@@ -68,12 +73,12 @@ public final class LZ4Rq3Runner {
         }
     }
 
-    private static byte[] sha256(byte[] input) throws Exception {
+    private byte[] sha256(byte[] input) throws Exception {
         return MessageDigest.getInstance("SHA-256").digest(input);
     }
 
-    private static String quote(String value) { return "\"" + value.replace("\"", "\"\"") + "\""; }
-    private static String hexPrefix(byte[] hash) {
+    private String quote(String value) { return "\"" + value.replace("\"", "\"\"") + "\""; }
+    private String hexPrefix(byte[] hash) {
         StringBuilder text = new StringBuilder(16);
         for (int i = 0; i < 8; i++) text.append(String.format(Locale.ROOT, "%02x", hash[i] & 255));
         return text.toString();

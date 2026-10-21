@@ -10,23 +10,23 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
 
 class LZ4CodecTest {
-    private static byte[] container(int size, byte... block) {
+    private byte[] container(int size, byte... block) {
         return ByteBuffer.allocate(16 + block.length).putInt(0x4c5a3442)
                 .putLong(size).putInt(block.length).put(block).array();
     }
 
-    private static void roundTrip(LZ4Codec codec, byte[] input) {
+    private void roundTrip(LZ4Codec codec, byte[] input) {
         byte[] before = input.clone();
         byte[] encoded = codec.compress(input);
         byte[] saved = encoded.clone();
-        assertArrayEquals(input, codec.decompress(encoded));
-        assertArrayEquals(before, input);
-        assertArrayEquals(saved, encoded);
+        Assertions.assertArrayEquals(input, codec.decompress(encoded));
+        Assertions.assertArrayEquals(before, input);
+        Assertions.assertArrayEquals(saved, encoded);
         // Cross-hash decoding: decoder does not depend on encoder's table size.
-        assertArrayEquals(input, new LZ4Codec(codec.getHashLog() == 12 ? 16 : 12).decompress(encoded));
+        Assertions.assertArrayEquals(input, new LZ4Codec(codec.getHashLog() == 12 ? 16 : 12).decompress(encoded));
     }
 
     @ParameterizedTest @ValueSource(ints = {12, 16})
@@ -37,11 +37,11 @@ class LZ4CodecTest {
             Arrays.fill(input, (byte) 65);
             roundTrip(codec, input);
             byte[] encoded = codec.compress(input);
-            assertEquals(n + 17, encoded.length);
-            assertEquals(n << 4, encoded[16] & 255);
-            assertEquals(0, codec.analyze(encoded).getMatchCount());
+            Assertions.assertEquals(n + 17, encoded.length);
+            Assertions.assertEquals(n << 4, encoded[16] & 255);
+            Assertions.assertEquals(0, codec.analyze(encoded).getMatchCount());
         }
-        assertEquals(1, codec.analyze(codec.compress(new byte[0])).getSequenceCount());
+        Assertions.assertEquals(1, codec.analyze(codec.compress(new byte[0])).getSequenceCount());
     }
 
     @ParameterizedTest @ValueSource(ints = {12, 16})
@@ -53,9 +53,9 @@ class LZ4CodecTest {
             roundTrip(codec, input);
             if (n <= 271) {
                 byte[] encoded = codec.compress(input);
-                assertEquals(0, codec.analyze(encoded).getMatchCount());
-                if (n == 15) assertEquals(0, encoded[17]);
-                if (n == 270) { assertEquals(255, encoded[17] & 255); assertEquals(0, encoded[18]); }
+                Assertions.assertEquals(0, codec.analyze(encoded).getMatchCount());
+                if (n == 15) Assertions.assertEquals(0, encoded[17]);
+                if (n == 270) { Assertions.assertEquals(255, encoded[17] & 255); Assertions.assertEquals(0, encoded[18]); }
             }
         }
         byte[] all = new byte[256];
@@ -72,13 +72,13 @@ class LZ4CodecTest {
             roundTrip(codec, input);
             byte[] encoded = codec.compress(input);
             LZ4Codec.BlockStatistics stats = codec.analyze(encoded);
-            assertEquals(2, stats.getSequenceCount());
-            assertEquals(1, stats.getMatchCount());
-            assertEquals(n - 6, stats.getTotalMatchLength());
-            assertEquals(n - 6, stats.getAverageMatchLength());
-            assertEquals(1, encoded[18]); // offset=1 little-endian
-            assertEquals(0, encoded[19]);
-            assertEquals(0x50, encoded[encoded.length - 6]);
+            Assertions.assertEquals(2, stats.getSequenceCount());
+            Assertions.assertEquals(1, stats.getMatchCount());
+            Assertions.assertEquals(n - 6, stats.getTotalMatchLength());
+            Assertions.assertEquals(n - 6, stats.getAverageMatchLength());
+            Assertions.assertEquals(1, encoded[18]); // offset=1 little-endian
+            Assertions.assertEquals(0, encoded[19]);
+            Assertions.assertEquals(0x50, encoded[encoded.length - 6]);
         }
     }
 
@@ -109,12 +109,12 @@ class LZ4CodecTest {
                 if (repeated) for (int p = 31; p < n; p++) input[p] = input[p % 31];
                 byte[] ours = codec.compress(input);
                 byte[] decoded = new byte[n];
-                assertEquals(n, oracle.safeDecompressor().decompress(ours, 16, ours.length - 16, decoded, 0, n));
-                assertArrayEquals(input, decoded);
+                Assertions.assertEquals(n, oracle.safeDecompressor().decompress(ours, 16, ours.length - 16, decoded, 0, n));
+                Assertions.assertArrayEquals(input, decoded);
                 byte[] other = oracle.fastCompressor().compress(input);
-                assertArrayEquals(input, codec.decompress(container(n, other)));
+                Assertions.assertArrayEquals(input, codec.decompress(container(n, other)));
                 byte[] high = oracle.highCompressor().compress(input);
-                assertArrayEquals(input, codec.decompress(container(n, high)));
+                Assertions.assertArrayEquals(input, codec.decompress(container(n, high)));
             }
         }
     }
@@ -122,7 +122,7 @@ class LZ4CodecTest {
     @Test void handCraftedOffsetsAndMaximumDistance() {
         LZ4Codec codec = new LZ4Codec();
         // 8 literals, 7-byte match offset=8, 5 final literals; last match at size-12.
-        assertArrayEquals("abcdefghabcdefg12345".getBytes(java.nio.charset.StandardCharsets.US_ASCII),
+        Assertions.assertArrayEquals("abcdefghabcdefg12345".getBytes(java.nio.charset.StandardCharsets.US_ASCII),
                 codec.decompress(container(20, (byte) 0x83, (byte)'a', (byte)'b', (byte)'c', (byte)'d',
                         (byte)'e', (byte)'f', (byte)'g', (byte)'h', (byte)8, (byte)0,
                         (byte)0x50, (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5')));
@@ -138,8 +138,8 @@ class LZ4CodecTest {
         block.write(0x50);
         for (int i = 0; i < 5; i++) block.write(i);
         byte[] decoded = codec.decompress(container(65547, block.toByteArray()));
-        assertArrayEquals(Arrays.copyOf(literals, 7), Arrays.copyOfRange(decoded, 65535, 65542));
-        assertEquals(7, codec.analyze(container(65547, block.toByteArray())).getAverageMatchLength());
+        Assertions.assertArrayEquals(Arrays.copyOf(literals, 7), Arrays.copyOfRange(decoded, 65535, 65542));
+        Assertions.assertEquals(7, codec.analyze(container(65547, block.toByteArray())).getAverageMatchLength());
     }
 
     @Test void rejectsCorruptHeadersAndTruncations() {
@@ -147,16 +147,16 @@ class LZ4CodecTest {
         byte[] good = codec.compress(new byte[1024]);
         for (int n = 0; n < good.length; n++) {
             byte[] truncated = Arrays.copyOf(good, n);
-            assertThrows(IllegalArgumentException.class, () -> codec.decompress(truncated));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> codec.decompress(truncated));
         }
         byte[] magic = good.clone(); magic[0] = 0;
-        assertThrows(IllegalArgumentException.class, () -> codec.decompress(magic));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> codec.decompress(magic));
         for (long n : new long[]{-1, 1, 1023, 1025, 67108865L, Long.MAX_VALUE}) {
             byte[] bad = good.clone(); ByteBuffer.wrap(bad).putLong(4, n);
-            assertThrows(IllegalArgumentException.class, () -> codec.decompress(bad));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> codec.decompress(bad));
         }
         byte[] trailing = Arrays.copyOf(good, good.length + 1);
-        assertThrows(IllegalArgumentException.class, () -> codec.decompress(trailing));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> codec.decompress(trailing));
     }
 
     @Test void rejectsMalformedBlocksWithConsistentHeader() {
@@ -174,33 +174,33 @@ class LZ4CodecTest {
             {0x10, 65, 1, 0, 0x50, 1, 2, 3, 4, 5} // match starts less than 12 before end
         };
         for (byte[] block : blocks) {
-            assertThrows(IllegalArgumentException.class, () -> codec.decompress(container(10, block)));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> codec.decompress(container(10, block)));
         }
         byte[] bomb = new byte[9_000_000];
         bomb[0] = (byte)0xf0; Arrays.fill(bomb, 1, bomb.length, (byte)255);
-        assertThrows(IllegalArgumentException.class, () -> codec.decompress(container(67108864, bomb)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> codec.decompress(container(67108864, bomb)));
     }
 
     @Test void parametersAndNulls() {
-        assertEquals(12, new LZ4Codec().getHashLog());
-        assertEquals("LZ4", new LZ4Codec().getName());
+        Assertions.assertEquals(12, new LZ4Codec().getHashLog());
+        Assertions.assertEquals("LZ4", new LZ4Codec().getName());
         for (int log : new int[]{0, 11, 13, 15, 17, 32}) {
-            assertThrows(IllegalArgumentException.class, () -> new LZ4Codec(log));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> new LZ4Codec(log));
         }
-        assertThrows(NullPointerException.class, () -> new LZ4Codec().compress(null));
-        assertThrows(NullPointerException.class, () -> new LZ4Codec().decompress(null));
+        Assertions.assertThrows(NullPointerException.class, () -> new LZ4Codec().compress(null));
+        Assertions.assertThrows(NullPointerException.class, () -> new LZ4Codec().decompress(null));
     }
 
     @ParameterizedTest @ValueSource(ints = {12, 16})
     void full64MiBBoundary(int log) {
-        byte[] input = new byte[LZ4Codec.MAX_INPUT_SIZE];
-        new Random(64).nextBytes(input);
         LZ4Codec codec = new LZ4Codec(log);
+        byte[] input = new byte[codec.getMaxInputSize()];
+        new Random(64).nextBytes(input);
         byte[] encoded = codec.compress(input);
-        assertArrayEquals(input, codec.decompress(encoded));
+        Assertions.assertArrayEquals(input, codec.decompress(encoded));
         Arrays.fill(input, (byte)0xff);
         encoded = codec.compress(input);
-        assertArrayEquals(input, codec.decompress(encoded));
-        assertThrows(IllegalArgumentException.class, () -> codec.compress(new byte[LZ4Codec.MAX_INPUT_SIZE + 1]));
+        Assertions.assertArrayEquals(input, codec.decompress(encoded));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> codec.compress(new byte[codec.getMaxInputSize() + 1]));
     }
 }

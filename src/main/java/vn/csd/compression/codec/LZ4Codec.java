@@ -7,13 +7,12 @@ import java.util.Objects;
 
 /** Independent LZ4 block in an LZ4B container; lengths in header are big-endian. */
 public final class LZ4Codec implements Codec {
-    public static final int DEFAULT_HASH_LOG = 12;
-    public static final int MAX_INPUT_SIZE = 64 * 1024 * 1024;
-    public static final int HEADER_SIZE = 16;
-    private static final int MAGIC = 0x4c5a3442;
+    private final int maxInputSize = 64 * 1024 * 1024;
+    private final int headerSize = 16;
+    private final int magic = 0x4c5a3442;
     private final int hashLog;
 
-    public LZ4Codec() { this(DEFAULT_HASH_LOG); }
+    public LZ4Codec() { this(12); }
 
     public LZ4Codec(int hashLog) {
         if (hashLog != 12 && hashLog != 16) {
@@ -23,16 +22,17 @@ public final class LZ4Codec implements Codec {
     }
 
     public int getHashLog() { return hashLog; }
+    public int getMaxInputSize() { return maxInputSize; }
     @Override public String getName() { return "LZ4"; }
 
     @Override public byte[] compress(byte[] input) {
         Objects.requireNonNull(input, "input");
         int n = input.length;
-        if (n > MAX_INPUT_SIZE) throw new IllegalArgumentException("Input exceeds 64 MiB");
+        if (n > maxInputSize) throw new IllegalArgumentException("Input exceeds 64 MiB");
         int[] table = new int[1 << hashLog];
         Arrays.fill(table, -1);
         ByteArrayOutputStream out = new ByteArrayOutputStream(n + n / 255 + 32);
-        for (int i = 0; i < HEADER_SIZE; i++) out.write(0);
+        for (int i = 0; i < headerSize; i++) out.write(0);
         int anchor = 0;
         int pos = 0;
         while (pos <= n - 12) {
@@ -68,7 +68,7 @@ public final class LZ4Codec implements Codec {
         if (tail >= 15) writeLength(out, tail - 15);
         out.write(input, anchor, tail);
         byte[] result = out.toByteArray();
-        ByteBuffer.wrap(result).putInt(MAGIC).putLong(n).putInt(result.length - HEADER_SIZE);
+        ByteBuffer.wrap(result).putInt(magic).putLong(n).putInt(result.length - headerSize);
         return result;
     }
 
@@ -86,19 +86,19 @@ public final class LZ4Codec implements Codec {
         return parse(compressed, originalSize(compressed), null);
     }
 
-    private static int originalSize(byte[] data) {
+    private int originalSize(byte[] data) {
         Objects.requireNonNull(data, "compressed");
-        if (data.length < HEADER_SIZE + 1) throw invalid("Truncated header/block");
+        if (data.length < headerSize + 1) throw invalid("Truncated header/block");
         ByteBuffer header = ByteBuffer.wrap(data);
-        if (header.getInt() != MAGIC) throw invalid("Bad LZ4B magic");
+        if (header.getInt() != magic) throw invalid("Bad LZ4B magic");
         long length = header.getLong();
-        if (length < 0 || length > MAX_INPUT_SIZE) throw invalid("Invalid original length");
-        if (header.getInt() != data.length - HEADER_SIZE) throw invalid("Block length mismatch");
+        if (length < 0 || length > maxInputSize) throw invalid("Invalid original length");
+        if (header.getInt() != data.length - headerSize) throw invalid("Block length mismatch");
         return (int) length;
     }
 
-    private static BlockStatistics parse(byte[] data, int size, byte[] output) {
-        Cursor cursor = new Cursor(HEADER_SIZE);
+    private BlockStatistics parse(byte[] data, int size, byte[] output) {
+        Cursor cursor = new Cursor(headerSize);
         int written = 0;
         int sequences = 0;
         int matches = 0;
@@ -136,7 +136,7 @@ public final class LZ4Codec implements Codec {
         throw invalid("Missing final literal sequence");
     }
 
-    private static int readLength(byte[] data, Cursor cursor, int base, int limit) {
+    private int readLength(byte[] data, Cursor cursor, int base, int limit) {
         int length = base;
         if (length > limit) throw invalid("Length exceeds output");
         if (base == 15) {
@@ -155,26 +155,26 @@ public final class LZ4Codec implements Codec {
         return (readIntLE(input, pos) * 0x9e3779b1) >>> (32 - hashLog);
     }
 
-    private static int readIntLE(byte[] a, int p) {
+    private int readIntLE(byte[] a, int p) {
         return (a[p] & 255) | ((a[p + 1] & 255) << 8)
                 | ((a[p + 2] & 255) << 16) | ((a[p + 3] & 255) << 24);
     }
 
-    private static void writeLength(ByteArrayOutputStream out, int length) {
+    private void writeLength(ByteArrayOutputStream out, int length) {
         while (length >= 255) { out.write(255); length -= 255; }
         out.write(length);
     }
 
-    private static IllegalArgumentException invalid(String message) {
+    private IllegalArgumentException invalid(String message) {
         return new IllegalArgumentException("Invalid LZ4B: " + message);
     }
 
-    private static final class Cursor {
+    private final class Cursor {
         private int pos;
         private Cursor(int pos) { this.pos = pos; }
     }
 
-    public static final class BlockStatistics {
+    public final class BlockStatistics {
         private final int sequenceCount;
         private final int matchCount;
         private final long totalMatchLength;

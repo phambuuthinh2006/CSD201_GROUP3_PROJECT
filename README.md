@@ -91,7 +91,39 @@ int fullAt = codec.getDictionaryFullAt(); // Vị trí byte input khi từ đi�
 
 ---
 
-## 4. Phần TV5 — LZ4 (LZ4 Block Format)
+## 4. Phần TV3 — Huffman (Canonical Huffman)
+
+Phụ trách: **TV3 (Cặp 2)** — Chi nhánh: `feature/huffman-tv3`
+
+```java
+import vn.csd.compression.codec.HuffmanCodec;
+
+HuffmanCodec codec = new HuffmanCodec();
+byte[] compressed = codec.compress(input);
+byte[] restored = codec.decompress(compressed);
+long expectedBits = codec.calculateExpectedPayloadBits(input); // Kiểm chứng T10
+```
+
+### Đặc tả kỹ thuật Huffman:
+- **Header:** Magic `HUF1` (4 byte), theo sau là 8 byte big-endian lưu độ dài gốc, và 256 byte bảng code lengths cho từng ký hiệu 0–255 (tổng header = 268 byte).
+- **Canonical Huffman Code:** Sắp xếp theo `(codeLength, symbol)`, sinh mã chuẩn không tiền tố.
+- **Đóng gói bit:** Dùng `BitWriter` và `BitReader` với bộ đệm `long`, mã hóa theo thứ tự bit cao trước (**MSB-first**), cuối payload bù bit 0.
+- **Xử lý ngoại lệ & ca biên:**
+  - Input rỗng: header 268 byte, giải nén trả về mảng 0 byte.
+  - Input chỉ 1 ký hiệu: dùng mã 1 bit (`codeLength = 1`, bit `0`).
+  - Input tối đa 64 MiB; dữ liệu hỏng hoặc magic sai ném `IllegalArgumentException`.
+
+### Chạy riêng bộ kiểm thử Huffman nghiệm thu (T01 – T12):
+- **Bằng lệnh Java trực tiếp (không cần Maven):**
+  ```powershell
+  # Trên Windows PowerShell:
+  javac -encoding UTF-8 -d bin src/main/java/vn/csd/compression/codec/*.java src/main/java/vn/csd/compression/io/*.java src/test/java/vn/csd/compression/HuffmanCodecTest.java
+  java "-Dfile.encoding=UTF-8" -cp bin vn.csd.compression.HuffmanCodecTest
+  ```
+
+---
+
+## 5. Phần TV5 — LZ4 (LZ4 Block Format)
 
 Phụ trách: **TV5 (Nhóm trưởng)** — Chi nhánh: `feature/lz4-tv5`
 

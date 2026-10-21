@@ -16,7 +16,23 @@ src/
     └── ...          # Unit test từng codec và kiểm thử tích hợp
 ```
 
-Đây là cấu trúc dự kiến cho toàn nhóm. Trên branch TV5 hiện có interface chung, LZ4 và test/runner LZ4; các thành viên còn lại bàn giao qua branch riêng.
+Đây là cấu trúc chung cho toàn nhóm. Repository hiện có interface chung, RLE và LZ4; Huffman, LZW cùng runner RQ1 cần được tích hợp từ các phần bàn giao tương ứng.
+
+## Phần TV1 — RLE
+
+```java
+import vn.csd.compression.codec.RLECodec;
+
+RLECodec codec = new RLECodec();
+byte[] compressed = codec.compress(input);
+byte[] restored = codec.decompress(compressed);
+```
+
+- Container RLE1 gồm magic `RLE1`, độ dài dữ liệu gốc 8 byte big-endian, sau đó là các cặp `(count, value)`; `count` từ 1 đến 255.
+- Run dài hơn 255 byte được tách thành nhiều cặp. File rỗng có header 12 byte, không có payload.
+- Decoder từ chối magic sai, header/payload bị cắt, count bằng 0 và độ dài giải nén không khớp. Null gây `NullPointerException`; container không hợp lệ gây `IllegalArgumentException`.
+- Test: `mvn -Dtest=RLECodecTest test`; các ca T01, T02, T03, T07, T09 và T12 kiểm round-trip, cặp biên và SHA-256.
+- Phân tích thuật toán và trạng thái RQ1: [TV1 RLE và RQ1](docs/TV1_RLE_RQ1.md).
 
 ## Build và test
 

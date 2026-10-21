@@ -1,0 +1,1 @@
+Java=17.0.20.1+1; VM=OpenJDK 64-Bit Server VM; OS=Linux amd64; maxHeap=1073741824; JVM args=[-Xmx1g]; warmups=1; repeats=2

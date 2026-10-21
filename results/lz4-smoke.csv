@@ -1,0 +1,5 @@
+file,hash_log,iteration,input_bytes,compressed_bytes,ratio,compress_ns,decompress_ns,compress_mib_s,decompress_mib_s,lz4_sequence_count,lz4_match_count,lz4_avg_match_length,output_check,status
+"src/main/java/vn/csd/compression/codec/LZ4Codec.java",12,1,8213,3821,0.465238037,679878,603993,11.520489,12.967910,804,803,8.562889,7f039fefa164af59,PASS
+"src/main/java/vn/csd/compression/codec/LZ4Codec.java",12,2,8213,3821,0.465238037,731132,643894,10.712877,12.164311,804,803,8.562889,7f039fefa164af59,PASS
+"src/main/java/vn/csd/compression/codec/LZ4Codec.java",16,1,8213,3790,0.461463533,743708,618292,10.531724,12.668007,814,813,8.532595,7f039fefa164af59,PASS
+"src/main/java/vn/csd/compression/codec/LZ4Codec.java",16,2,8213,3790,0.461463533,713316,630117,10.980445,12.430274,814,813,8.532595,7f039fefa164af59,PASS

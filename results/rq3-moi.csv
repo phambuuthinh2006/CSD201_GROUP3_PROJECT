@@ -1,0 +1,3 @@
+file,hash_log,iteration,input_bytes,compressed_bytes,ratio,compress_ns,decompress_ns,compress_mib_s,decompress_mib_s,lz4_sequence_count,lz4_match_count,lz4_avg_match_length,output_check,status
+"README.md",12,1,8536,4722,0.553186504,947700,1829600,8.589811,4.449368,759,758,8.150396,d925e84b12b32ba3,PASS
+"README.md",16,1,8536,4599,0.538776945,1101900,606900,7.387752,13.413353,789,788,8.101523,d925e84b12b32ba3,PASS

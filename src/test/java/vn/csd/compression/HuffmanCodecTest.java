@@ -14,7 +14,7 @@ import java.util.Random;
  * Đáp ứng đầy đủ các ca biên theo đề bài Đề tài 4 (CSD201):
  * - T01: Input rỗng
  * - T02: 1 byte (Huffman mã 1 bit)
- * - T03: 1 MiB cùng một byte
+ * - T03: 1 MiB cùng một byteþ
  * - T04: 256 giá trị byte, mỗi giá trị đúng 1 lần
  * - T09: Magic sai bị từ chối
  * - T10: Huffman payload bits = Σ (frequency × codeLength)

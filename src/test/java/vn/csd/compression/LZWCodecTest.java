@@ -1,5 +1,7 @@
 package vn.csd.compression;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import vn.csd.compression.codec.LZWCodec;
 
 import java.nio.charset.StandardCharsets;
@@ -10,6 +12,7 @@ import java.util.Random;
 /**
  * Bộ kiểm thử nghiệm thu cho LZWCodec theo yêu cầu Đề tài 4 (CSD201).
  * Chứa các ca biên bắt buộc: T01, T02, T03, T04, T05, T08, T09 và kiểm tra SHA-256.
+ * Mỗi hàm đều có annotation @Test để hiển thị nút mũi tên xanh chạy riêng trong IDE.
  */
 public class LZWCodecTest {
 
@@ -30,49 +33,16 @@ public class LZWCodecTest {
     private static void assertTrue(boolean condition, String message) {
         if (!condition) {
             System.err.println("❌ FAILED: " + message);
-            throw new AssertionError(message);
+            Assertions.fail(message);
         } else {
             System.out.println("✅ PASSED: " + message);
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println("=================================================");
-        System.out.println("  BẮT ĐẦU CHẠY BỘ TEST NGHIỆM THU CHO LZW CODEC");
-        System.out.println("=================================================");
-
+    // T01: Input rỗng
+    @Test
+    public void testT01_EmptyInput() {
         LZWCodec codec = new LZWCodec();
-
-        // T01: Input rỗng
-        testT01_EmptyInput(codec);
-
-        // T02: 1 byte
-        testT02_SingleByte(codec);
-
-        // T03: 1 MiB cùng một byte
-        testT03_RepeatedByte(codec);
-
-        // T04: 256 giá trị byte, mỗi giá trị 1 lần
-        testT04_All256Bytes(codec);
-
-        // T05: Chuỗi kinh điển ABABABA (Kiểm tra KwKwK)
-        testT05_KwKwK_ABABABA(codec);
-
-        // T08: Input lớn làm đầy từ điển 4096 mục
-        testT08_DictionaryFull(codec);
-
-        // T09: Magic sai -> Decoder từ chối
-        testT09_InvalidMagic(codec);
-
-        // Test mở rộng: Dữ liệu ngẫu nhiên với SHA-256
-        testRandomData(codec);
-
-        System.out.println("=================================================");
-        System.out.println("🎉 CHÚC MỪNG: TẤT CẢ CÁC CA KIỂM THỬ LZW ĐÃ PASS!");
-        System.out.println("=================================================");
-    }
-
-    public static void testT01_EmptyInput(LZWCodec codec) {
         byte[] input = new byte[0];
         byte[] compressed = codec.compress(input);
         byte[] decompressed = codec.decompress(compressed);
@@ -81,7 +51,10 @@ public class LZWCodecTest {
         assertTrue(decompressed.length == 0, "T01 - Input rỗng round-trip thành công");
     }
 
-    public static void testT02_SingleByte(LZWCodec codec) {
+    // T02: 1 byte
+    @Test
+    public void testT02_SingleByte() {
+        LZWCodec codec = new LZWCodec();
         byte[] input = new byte[]{(byte) 'X'};
         byte[] compressed = codec.compress(input);
         byte[] decompressed = codec.decompress(compressed);
@@ -89,7 +62,10 @@ public class LZWCodecTest {
         assertTrue(Arrays.equals(input, decompressed), "T02 - Input 1 byte round-trip chính xác");
     }
 
-    public static void testT03_RepeatedByte(LZWCodec codec) {
+    // T03: 1 MiB cùng một byte
+    @Test
+    public void testT03_RepeatedByte() {
+        LZWCodec codec = new LZWCodec();
         int size = 1024 * 1024; // 1 MiB
         byte[] input = new byte[size];
         Arrays.fill(input, (byte) 'A');
@@ -104,7 +80,10 @@ public class LZWCodecTest {
         assertTrue(ratio < 0.05, "T03 - Dữ liệu lặp nén cực tốt (tỷ lệ < 5%)");
     }
 
-    public static void testT04_All256Bytes(LZWCodec codec) {
+    // T04: 256 giá trị byte, mỗi giá trị 1 lần
+    @Test
+    public void testT04_All256Bytes() {
+        LZWCodec codec = new LZWCodec();
         byte[] input = new byte[256];
         for (int i = 0; i < 256; i++) {
             input[i] = (byte) i;
@@ -116,7 +95,10 @@ public class LZWCodecTest {
         assertTrue(Arrays.equals(input, decompressed), "T04 - Đủ 256 byte khác nhau round-trip chính xác");
     }
 
-    public static void testT05_KwKwK_ABABABA(LZWCodec codec) {
+    // T05: Chuỗi kinh điển ABABABA (Kiểm tra KwKwK)
+    @Test
+    public void testT05_KwKwK_ABABABA() {
+        LZWCodec codec = new LZWCodec();
         byte[] input = "ABABABA".getBytes(StandardCharsets.US_ASCII);
         byte[] compressed = codec.compress(input);
         byte[] decompressed = codec.decompress(compressed);
@@ -125,9 +107,10 @@ public class LZWCodecTest {
         assertTrue("ABABABA".equals(resultStr), "T05 - Ca biên KwKwK (ABABABA) giải nén ra đúng 'ABABABA'");
     }
 
-    public static void testT08_DictionaryFull(LZWCodec codec) {
-        // Tạo chuỗi có nhiều tổ hợp lặp để từ điển vượt 4096 mục
-        // Ví dụ: sinh văn bản với 50.000 byte
+    // T08: Input lớn làm đầy từ điển 4096 mục
+    @Test
+    public void testT08_DictionaryFull() {
+        LZWCodec codec = new LZWCodec();
         Random rnd = new Random(42);
         byte[] input = new byte[100000];
         for (int i = 0; i < input.length; i++) {
@@ -144,7 +127,10 @@ public class LZWCodecTest {
         assertTrue(Arrays.equals(input, decompressed), "T08 - Sau khi từ điển đóng băng, dữ liệu vẫn giải nén đúng 100%");
     }
 
-    public static void testT09_InvalidMagic(LZWCodec codec) {
+    // T09: Magic sai -> Decoder từ chối
+    @Test
+    public void testT09_InvalidMagic() {
+        LZWCodec codec = new LZWCodec();
         byte[] fakeData = new byte[16];
         fakeData[0] = 'B';
         fakeData[1] = 'A';
@@ -161,7 +147,10 @@ public class LZWCodecTest {
         assertTrue(rejected, "T09 - Decoder từ chối magic sai hợp lệ");
     }
 
-    public static void testRandomData(LZWCodec codec) {
+    // Test mở rộng: Dữ liệu ngẫu nhiên với SHA-256
+    @Test
+    public void testRandomData() {
+        LZWCodec codec = new LZWCodec();
         Random rnd = new Random(12345);
         byte[] input = new byte[200000];
         rnd.nextBytes(input);
@@ -172,5 +161,26 @@ public class LZWCodecTest {
         String decompressedSha = sha256Hex(decompressed);
 
         assertTrue(inputSha.equals(decompressedSha), "Random Test - SHA-256 trước và sau giải nén trùng khớp tuyệt đối!");
+    }
+
+    // Hàm main để có thể chạy trực tiếp bằng dòng lệnh hoặc file .bat
+    public static void main(String[] args) {
+        System.out.println("=================================================");
+        System.out.println("  BẮT ĐẦU CHẠY BỘ TEST NGHIỆM THU CHO LZW CODEC");
+        System.out.println("=================================================");
+
+        LZWCodecTest test = new LZWCodecTest();
+        test.testT01_EmptyInput();
+        test.testT02_SingleByte();
+        test.testT03_RepeatedByte();
+        test.testT04_All256Bytes();
+        test.testT05_KwKwK_ABABABA();
+        test.testT08_DictionaryFull();
+        test.testT09_InvalidMagic();
+        test.testRandomData();
+
+        System.out.println("=================================================");
+        System.out.println("🎉 CHÚC MỪNG: TẤT CẢ CÁC CA KIỂM THỬ LZW ĐÃ PASS!");
+        System.out.println("=================================================");
     }
 }

@@ -54,6 +54,13 @@ mvn clean compile
 mvn test
 ```
 
+### Chạy riêng unit test TV1/RLE:
+```sh
+mvn -Dtest=RLECodecTest test
+```
+
+`RLECodecTest` dùng JUnit 5 và kiểm thử T01 (rỗng), T02 (1 byte), T03 (1 MiB cùng byte), T07 (run 255/256), T09 (magic sai), T12 (random có đối chiếu SHA-256) cùng container malformed/null.
+
 ---
 
 ## 3. Phần TV2 — LZW (Lempel-Ziv-Welch 12-bit)

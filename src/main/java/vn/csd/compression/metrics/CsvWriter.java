@@ -1,58 +1,73 @@
 
 package vn.csd.compression.metrics;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import vn.csd.compression.metrics.BenchmarkRunner.BenchmarkResult;
+import java.nio.file.StandardOpenOption;
 
 public class CsvWriter {
 
     private static final String HEADER =
             "rq,dataset,file,variant,seed,input_bytes,codec,params,"
-            + "compressed_bytes,ratio,compress_ns,decompress_ns,"
-            + "compress_mib_s,decompress_mib_s,"
-            + "compress_heap_aux_bytes,decompress_heap_aux_bytes,"
-            + "entropy_h0,lzw_dictionary_full_at,lz4_sequence_count,"
-            + "lz4_avg_match_length,output_check,status";
+          + "compressed_bytes,ratio,compress_ns,decompress_ns,"
+          + "compress_mib_s,decompress_mib_s,"
+          + "compress_heap_aux_bytes,decompress_heap_aux_bytes,"
+          + "entropy_h0,lzw_dictionary_full_at,lz4_sequence_count,"
+          + "lz4_avg_match_length,output_check,status";
 
     public static void writeResult(
             String filePath,
-            BenchmarkResult result) {
+            BenchmarkRunner.BenchmarkResult result) throws IOException {
 
-        Path path = Paths.get(filePath);
-
-        try {
-            Path parent = path.getParent();
-
-            if (parent != null && !Files.exists(parent)) {
-                Files.createDirectories(parent);
-            }
-        } catch (IOException e) {
-            System.err.println(
-                    "Không thể tạo thư mục chứa file CSV: "
-                    + e.getMessage());
-            return;
+        if (filePath == null || filePath.trim().isEmpty()) {
+            throw new IllegalArgumentException("Đường dẫn CSV không được để trống");
         }
 
-        boolean fileExists = Files.exists(path);
+        if (result == null) {
+            throw new IllegalArgumentException("BenchmarkResult không được null");
+        }
 
-        try (PrintWriter writer =
-                     new PrintWriter(new FileWriter(filePath, true))) {
+        Path path = Paths.get(filePath);
+        Path parent = path.getParent();
 
-            if (!fileExists || Files.size(path) == 0) {
-                writer.println(HEADER);
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
+
+        boolean needsHeader = !Files.exists(path) || Files.size(path) == 0;
+
+        if (!needsHeader) {
+            String existingHeader;
+
+            try (java.io.BufferedReader reader = Files.newBufferedReader(
+                    path, StandardCharsets.UTF_8)) {
+                existingHeader = reader.readLine();
             }
 
-            writer.println(result.toCsvRow());
+            if (!HEADER.equals(existingHeader)) {
+                throw new IOException(
+                        "Header CSV không khớp schema hiện tại: " + path
+                );
+            }
+        }
 
-        } catch (IOException e) {
-            System.err.println(
-                    "Lỗi khi ghi file CSV: " + e.getMessage());
+        try (BufferedWriter writer = Files.newBufferedWriter(
+                path,
+                StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.APPEND)) {
+
+            if (needsHeader) {
+                writer.write(HEADER);
+                writer.newLine();
+            }
+
+            writer.write(result.toCsvRow());
+            writer.newLine();
         }
     }
 }

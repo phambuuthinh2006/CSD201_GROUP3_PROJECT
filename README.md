@@ -165,3 +165,28 @@ java -Xmx1g -cp target/classes vn.csd.compression.metrics.LZ4Rq3Runner \
 - [Hướng dẫn test và giải thích code TV5](docs/TV5_LZ4_HUONG_DAN_TEST.md)
 - [Bàn giao TV6 và tích hợp RQ3](docs/TV5_LZ4_RQ3.md)
 - [Kết quả smoke test](results/README.md)
+
+
+## Test và đo tốc độ từ terminal Windows/Linux
+
+Cần JDK17, Maven và Python3.9+. Cùng một harness đo RLE/Huffman/LZW/LZ4-12/LZ4-16 trên cùng input, chạy3JVM tuần tự và kiểm SHA-256 mọi lượt.
+
+Windows PowerShell (không cần WSL/Git Bash):
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\demo-terminal.ps1" -Mode all
+```
+
+Linux:
+
+```bash
+bash scripts/demo-terminal.sh all
+```
+
+Dùng `-Mode tv5` trên PowerShell hoặc `tv5` trên Bash để chạy riêng TV5. Chế độ all chạy56JUnit, generator và benchmark840lượt đo; hiện bảng ratio/tốc độ nén/giải nén1/4MiB. Đây là benchmark khảo sát, chưa thay ma trận RQ3 chính thức.
+
+- [Hướng dẫn Windows và phạm vi đã kiểm chứng](docs/HUONG_DAN_TEST_WINDOWS_POWERSHELL.md).
+- [Hướng dẫn Linux](docs/HUONG_DAN_QUAY_VIDEO_TEST_TERMINAL.md).
+- [Đầy đủ ca test và cách đọc số liệu](docs/KICH_BAN_BAO_CAO_TEST_TERMINAL_DAY_DU.md).
+
+Bản PowerShell đã được chạy trên PowerShell7/Linux; chưa chạy Windows thật. Xem hướng dẫn trước khi báo cáo kết quả trên Windows.

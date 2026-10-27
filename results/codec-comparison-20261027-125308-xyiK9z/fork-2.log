@@ -1,0 +1,9 @@
+fork=2; java=17.0.20.1+1; vm=OpenJDK 64-Bit Server VM; os=Linux; heap=1073741824; flags=[-Xms512m, -Xmx1g, -XX:+UseG1GC]; seed=20261027; warmups=5; repeats=7
+PASS fork=2 dataset=SINGLE_BYTE MiB=1 (5 codecs; 5 warm-up + 7 measured each; SHA-256 all rounds)
+PASS fork=2 dataset=LONG_RUNS MiB=1 (5 codecs; 5 warm-up + 7 measured each; SHA-256 all rounds)
+PASS fork=2 dataset=WORD_TEXT MiB=1 (5 codecs; 5 warm-up + 7 measured each; SHA-256 all rounds)
+PASS fork=2 dataset=UNIFORM_RANDOM MiB=1 (5 codecs; 5 warm-up + 7 measured each; SHA-256 all rounds)
+PASS fork=2 dataset=SINGLE_BYTE MiB=4 (5 codecs; 5 warm-up + 7 measured each; SHA-256 all rounds)
+PASS fork=2 dataset=LONG_RUNS MiB=4 (5 codecs; 5 warm-up + 7 measured each; SHA-256 all rounds)
+PASS fork=2 dataset=WORD_TEXT MiB=4 (5 codecs; 5 warm-up + 7 measured each; SHA-256 all rounds)
+PASS fork=2 dataset=UNIFORM_RANDOM MiB=4 (5 codecs; 5 warm-up + 7 measured each; SHA-256 all rounds)

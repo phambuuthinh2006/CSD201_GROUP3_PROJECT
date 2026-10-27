@@ -1,0 +1,9 @@
+610b8a90d22d5c60a92b14aa84b5d09a855a739e791e8942270d09ddd75c8245  src/main/java/vn/csd/compression/codec/Codec.java
+6e638320989639b9fe24835642a8957e4ce8ecb2470782388ab1660796079bbc  src/main/java/vn/csd/compression/codec/HuffmanCodec.java
+87790153de9658bd26b117a365bc0e402da65196e25e049d35bf176106642094  src/main/java/vn/csd/compression/codec/LZ4Codec.java
+d20110b49daaddb3d681d69eb3b1a5a250ae9be01214da636325f15e77b53881  src/main/java/vn/csd/compression/codec/LZWCodec.java
+a4450ebb364ef8fc184b235bcc0272a9638fdf714d528c69f24cb61269d1663d  src/main/java/vn/csd/compression/codec/RLECodec.java
+5415a7a7e93e5df89199ce9bc2462053fcfc97bae8a7f40388e7d396015a36b7  src/main/java/vn/csd/compression/io/BitReader.java
+9cbde2dbeccb9df054dc9d0142b58b8dbe55916466eb395926981e270cddc7a1  src/main/java/vn/csd/compression/io/BitWriter.java
+e662e37f4aa82a3d953b89b9feb1f168678fa946f55885a67bd8738531363463  scripts/benchmark/CodecComparison.java
+87c67f6806335e923427e7a67d83d7490f1c7f490176295c14dceca5d9500740  scripts/benchmark/run-comparison.sh

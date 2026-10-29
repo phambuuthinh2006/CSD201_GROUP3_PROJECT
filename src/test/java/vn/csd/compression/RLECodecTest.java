@@ -73,6 +73,7 @@ class RLECodecTest {
 
     @Test
     void T09_wrongMagicIsRejected() {
+
         byte[] encoded = codec.compress(new byte[]{1, 2, 3});
         encoded[0] = 'X';
 

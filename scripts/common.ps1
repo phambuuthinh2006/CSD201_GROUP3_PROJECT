@@ -38,7 +38,7 @@ function Get-CsdMaven {
     }
     foreach ($csdName in @('mvn.cmd', 'mvn')) {
         $csdFound = Get-Command -Name $csdName -CommandType Application -ErrorAction SilentlyContinue
-        if ($csdFound) { return $csdFound.Source }
+        if ($csdFound) { return [string]($csdFound | Select-Object -First 1).Source }
     }
     $csdCache = Join-Path ([Environment]::GetFolderPath('UserProfile')) '.cache/csd-tools/apache-maven-3.9.9/bin/mvn'
     if (Test-Path -LiteralPath $csdCache) { return $csdCache }
@@ -49,6 +49,7 @@ function Get-CsdPython {
     foreach ($csdName in @('py', 'python', 'python3')) {
         $csdFound = Get-Command -Name $csdName -CommandType Application -ErrorAction SilentlyContinue
         if ($csdFound) {
+            $csdFound = $csdFound | Select-Object -First 1
             $csdPrefix = @('-X', 'utf8')
             if ($csdName -eq 'py') { $csdPrefix = @('-3', '-X', 'utf8') }
             return [PSCustomObject]@{ Executable = $csdFound.Source; Prefix = $csdPrefix }

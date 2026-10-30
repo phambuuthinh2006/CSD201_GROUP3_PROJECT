@@ -1,10 +1,5 @@
 package vn.csd.compression.io;
 
-/**
- * Công cụ đọc chuỗi bit từ mảng byte theo thứ tự bit cao trước (MSB-first).
- * Sử dụng bộ đệm bit dạng long theo đặc tả Đề tài 4 (CSD201).
- * Phụ trách: TV3 (Cặp 2)
- */
 public class BitReader {
 
     private final byte[] data;
@@ -35,9 +30,7 @@ public class BitReader {
         this.totalBitsRead = 0L;
     }
 
-    /**
-     * Nạp thêm byte từ data vào bitBuffer khi bitCount còn ít.
-     */
+   
     private void refill() {
         while (bitCount <= 48 && bytePos < offset + length) {
             int b = data[bytePos++] & 0xFF;
@@ -46,10 +39,6 @@ public class BitReader {
         }
     }
 
-    /**
-     * Đọc 1 bit (0 hoặc 1) từ luồng bit (MSB-first).
-     * Trả về -1 nếu đã đọc hết bit của dữ liệu.
-     */
     public int readBit() {
         if (bitCount == 0) {
             if (bytePos >= offset + length) {
@@ -66,10 +55,7 @@ public class BitReader {
         return bit;
     }
 
-    /**
-     * Đọc numBits bit (1 đến 32 bit) từ luồng bit (MSB-first).
-     * Ném IllegalArgumentException nếu luồng không còn đủ số bit yêu cầu.
-     */
+
     public int readBits(int numBits) {
         if (numBits <= 0) {
             return 0;
@@ -95,16 +81,12 @@ public class BitReader {
         return result;
     }
 
-    /**
-     * Kiểm tra xem còn bit nào trong buffer hoặc còn byte trong mảng chưa đọc hay không.
-     */
+   
     public boolean hasRemainingBits() {
         return bitCount > 0 || bytePos < offset + length;
     }
 
-    /**
-     * Trả về tổng số bit đã đọc cho tới thời điểm hiện tại.
-     */
+
     public long getTotalBitsRead() {
         return totalBitsRead;
     }

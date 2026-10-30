@@ -11,14 +11,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Random;
 
-/**
- * Bo kiem thu nghiem thu toan dien cho HuffmanCodec, BitWriter, BitReader.
- * - Su dung JUnit 5 de hien thi thanh xanh 100% trong NetBeans (tab Test Results).
- * - In day du chi tiet tung phep kiem tra [PASS] PASSED ra man hinh console.
- * - Ho tro chay ca bang JUnit (Test File) lan chay bang ham main() (Run File).
- * 
- * Phuc trach: TV3 (Cap 2)
- */
+
 public class HuffmanCodecTest {
 
     private static String sha256Hex(byte[] data) {
@@ -46,39 +39,39 @@ public class HuffmanCodecTest {
 
         HuffmanCodecTest t = new HuffmanCodecTest();
 
-        // T01
+        
         t.testT01_EmptyInput_HeaderSize();
         t.testT01_EmptyInput_RoundTrip();
 
-        // T02
+        
         t.testT02_SingleByte_RoundTrip();
         t.testT02_SingleByte_CompressedSize269();
         t.testT02_SingleByte_CodeLength1Bit();
 
-        // T03
+        
         t.testT03_RepeatedByte_RoundTrip();
         t.testT03_RepeatedByte_TheoreticalSize();
         t.testT03_RepeatedByte_CompressionRatio();
 
-        // T04
+        
         t.testT04_All256Bytes_RoundTrip();
         t.testT04_All256Bytes_All8Bits();
 
-        // T09
+      
         t.testT09_InvalidMagic_Rejected();
 
-        // T10
+       
         t.testT10_PayloadBitsFormula_ABRACADABRA();
         t.testT10_PayloadBitsFormula_Shakespeare();
         t.testT10_PayloadBitsFormula_Seashore();
         t.testT10_PayloadBitsFormula_CSD201Text();
 
-        // T12
+        
         t.testT12_RandomData_100KB_SHA256();
         t.testT12_SimulatedText_300KB_SHA256();
         t.testT12_SimulatedText_CompressionRatio();
 
-        // Bo sung
+        
         t.testShortText_VietnameseUTF8();
         t.testBitWriter_WriteAndPadding();
         t.testBitReader_ReadBitAndBits();
@@ -90,10 +83,7 @@ public class HuffmanCodecTest {
         System.out.println("=================================================");
     }
 
-    // =========================================================================
-    // T01: INPUT RONG (0 BYTE)
-    // =========================================================================
-
+    
     @Test
     public void testT01_EmptyInput_HeaderSize() {
         HuffmanCodec codec = new HuffmanCodec();
@@ -110,9 +100,7 @@ public class HuffmanCodecTest {
         pass("T01 - Input rong round-trip thanh cong, tra ve mang 0 byte");
     }
 
-    // =========================================================================
-    // T02: INPUT 1 BYTE
-    // =========================================================================
+  
 
     @Test
     public void testT02_SingleByte_RoundTrip() {
@@ -140,9 +128,7 @@ public class HuffmanCodecTest {
         pass("T02 - Ky hieu don le co do dai ma chinh xac la 1 bit");
     }
 
-    // =========================================================================
-    // T03: 1 MiB CUNG 1 BYTE
-    // =========================================================================
+  
 
     @Test
     public void testT03_RepeatedByte_RoundTrip() {
@@ -180,9 +166,7 @@ public class HuffmanCodecTest {
         pass("T03 - Du lieu 1 byte lap nen dat ty le ~12.5% (dung 1 bit/byte)");
     }
 
-    // =========================================================================
-    // T04: DU 256 GIA TRI BYTE
-    // =========================================================================
+    
 
     @Test
     public void testT04_All256Bytes_RoundTrip() {
@@ -210,9 +194,7 @@ public class HuffmanCodecTest {
         pass("T04 - 256 ky hieu co tan suat bang nhau (1) deu duoc gan ma 8 bit");
     }
 
-    // =========================================================================
-    // T09: MAGIC SAI
-    // =========================================================================
+
 
     @Test
     public void testT09_InvalidMagic_Rejected() {
@@ -233,9 +215,7 @@ public class HuffmanCodecTest {
         pass("T09 - Decoder tu choi magic sai hop le");
     }
 
-    // =========================================================================
-    // T10: CONG THUC PAYLOAD BITS = SUM(freq * codeLength)
-    // =========================================================================
+  
 
     private void verifyT10Sample(String sample) {
         HuffmanCodec codec = new HuffmanCodec();
@@ -284,9 +264,7 @@ public class HuffmanCodecTest {
         verifyT10Sample("CSD201 Lossless Compression Project Canonical Huffman by TV3");
     }
 
-    // =========================================================================
-    // T12: DU LIEU NGAU NHIEN VA KIEM CHUNG SHA-256
-    // =========================================================================
+    
 
     @Test
     public void testT12_RandomData_100KB_SHA256() {
@@ -345,9 +323,7 @@ public class HuffmanCodecTest {
         pass("T12 - Van ban mo phong nen tot (< 85%)");
     }
 
-    // =========================================================================
-    // BO SUNG: CHUOI VAN BAN, BITWRITER, BITREADER, BIEN
-    // =========================================================================
+    
 
     @Test
     public void testShortText_VietnameseUTF8() {
@@ -364,11 +340,11 @@ public class HuffmanCodecTest {
     @Test
     public void testBitWriter_WriteAndPadding() {
         BitWriter writer = new BitWriter();
-        writer.writeBit(1);                   // 1 bit: 1
-        writer.writeBits(0b101, 3);           // 3 bit: 101
-        writer.writeBits(0b110011, 6);        // 6 bit: 110011
-        writer.writeBits(0xABCD, 16);         // 16 bit: 1010101111001101
-        writer.writeBit(0);                   // 1 bit: 0
+        writer.writeBit(1);                
+        writer.writeBits(0b101, 3);          
+        writer.writeBits(0b110011, 6);        
+        writer.writeBits(0xABCD, 16);         
+        writer.writeBit(0);                   
 
         Assertions.assertEquals(27, writer.getTotalBitsWritten());
         pass("BitWriter ghi dung 27 bit");

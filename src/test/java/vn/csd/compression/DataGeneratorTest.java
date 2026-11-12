@@ -33,19 +33,19 @@ public class DataGeneratorTest {
 
     private static void assertTrue(boolean condition, String message) {
         if (!condition) {
-            System.err.println("[FAIL] " + message);
+            System.err.println("[THAT BAI] " + message);
             throw new AssertionError(message);
         } else {
-            System.out.println("[PASS] " + message);
+            System.out.println("[DAT] " + message);
         }
     }
 
     private static void assertEquals(long expected, long actual, String message) {
         if (expected != actual) {
-            System.err.println("[FAIL] " + message + " (Expected: " + expected + ", Actual: " + actual + ")");
+            System.err.println("[THAT BAI] " + message + " (Expected: " + expected + ", Actual: " + actual + ")");
             throw new AssertionError(message);
         } else {
-            System.out.println("[PASS] " + message);
+            System.out.println("[DAT] " + message);
         }
     }
 
@@ -66,7 +66,7 @@ public class DataGeneratorTest {
     }
 
     public static void testBoundaries() {
-        System.out.println("\n--- 1. Kiem thu ca bien (size = 0, size = 1) ---");
+        System.out.println("\n--- 1. Kiem thu cac truong hop bien (Kich thuoc 0 byte va 1 byte) ---");
         byte[] c1_0 = DataGenerator.generateC1(0, 12345);
         byte[] c2_0 = DataGenerator.generateC2(0, 12345);
         byte[] c3_0 = DataGenerator.generateC3(0, 12345);
@@ -85,7 +85,7 @@ public class DataGeneratorTest {
     }
 
     public static void testReproducibility() {
-        System.out.println("\n--- 2. Kiem thu tinh tai lap tuyet doi (Seed Consistency) ---");
+        System.out.println("\n--- 2. Kiem thu tinh tai lap bang Seed (Cung seed phai ra cung du lieu) ---");
         long seed = 20261027L;
         int size = 64 * 1024; // 64 KiB
 
@@ -110,7 +110,7 @@ public class DataGeneratorTest {
     }
 
     public static void testC1Properties() {
-        System.out.println("\n--- 3. Kiem thu dac tinh C1 (Run Length ~ 32) ---");
+        System.out.println("\n--- 3. Kiem thu dac tinh tap C1 (Do dai doan lap trung binh ~32 bytes) ---");
         int size = 200000;
         byte[] c1 = DataGenerator.generateC1(size, 42L);
 
@@ -132,7 +132,7 @@ public class DataGeneratorTest {
         totalRunLengths += currentRun;
 
         double avgRun = (double) totalRunLengths / runCount;
-        System.out.printf("   [C1 Info] Tong run: %d, Do dai run trung binh thuc te: %.2f bytes (Ly thuyet: ~32)\n",
+        System.out.printf("   [Thong tin C1] Tong so doan lap: %d, Do dai doan lap trung binh: %.2f bytes (Ly thuyet: ~32 bytes)\n",
                 runCount, avgRun);
 
         // Chap nhan sai so thong ke vi mau 200KB (gia tri trong khoang 20 - 45)
@@ -140,7 +140,7 @@ public class DataGeneratorTest {
     }
 
     public static void testC2Properties() {
-        System.out.println("\n--- 4. Kiem thu dac tinh C2 (Tu vung 1000 tu, Zipf s=1) ---");
+        System.out.println("\n--- 4. Kiem thu dac tinh tap C2 (Kho tu vung 1000 tu, phan phoi Zipf s=1) ---");
         byte[][] vocab = DataGenerator.generateVocabulary(12345L);
         assertEquals(1000, vocab.length, "Tu vung dung 1000 tu");
 
@@ -167,7 +167,7 @@ public class DataGeneratorTest {
     }
 
     public static void testC3Properties() {
-        System.out.println("\n--- 5. Kiem thu dac tinh C3 (Byte ngau nhien phan phoi deu) ---");
+        System.out.println("\n--- 5. Kiem thu dac tinh tap C3 (Byte ngau nhien phan phoi dong deu tu 0 den 255) ---");
         int size = 256 * 1000; // 256.000 bytes
         byte[] c3 = DataGenerator.generateC3(size, 8888L);
         assertEquals(size, c3.length, "C3 sinh dung kich thuoc yeu cau");
@@ -185,7 +185,7 @@ public class DataGeneratorTest {
             if (count > max) max = count;
         }
 
-        System.out.printf("   [C3 Info] Tan suat ky vong: 1000 | Min: %d, Max: %d\n", min, max);
+        System.out.printf("   [Thong tin C3] Tan suat ky vong moi byte: 1000 lan | Thap nhat: %d lan, Cao nhat: %d lan\n", min, max);
         assertTrue(min > 700 && max < 1300, "C3 phan phoi tan suat byte gan dong deu tren [0, 255]");
     }
 }

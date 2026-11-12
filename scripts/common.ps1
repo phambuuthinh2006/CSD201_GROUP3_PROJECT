@@ -46,7 +46,7 @@ function Get-CsdMaven {
 }
 
 function Get-CsdPython {
-    foreach ($csdName in @('py', 'python', 'python3')) {
+    foreach ($csdName in @('py', 'C:\Users\Thái Quang Huy\AppData\Local\Programs\Python\Python312\python.exe', 'python', 'python3')) {
         $csdFound = Get-Command -Name $csdName -CommandType Application -ErrorAction SilentlyContinue
         if ($csdFound) {
             $csdFound = $csdFound | Select-Object -First 1
